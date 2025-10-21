@@ -17,7 +17,7 @@ var DEFAULT_MODEL = "Qwen 3 32B"
 
 func getModels() []ModelInfo {
 	models := []ModelInfo{
-		{Name: "Qwen 3 32B (Default)", Code: "qwen/qwen3-32b", Speed: 400},
+		{Name: "Qwen 3 32B", Code: "qwen/qwen3-32b", Speed: 400},
 		{Name: "OpenAI GPT OSS 120B", Code: "openai/gpt-oss-120b", Speed: 500},
 		{Name: "OpenAI GPT OSS 20B", Code: "openai/gpt-oss-20b", Speed: 1000},
 		{Name: "Llama 3.3 70B", Code: "llama-3.3-70b-versatile", Speed: 280},

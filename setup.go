@@ -59,6 +59,9 @@ func setup() {
 	}
 	for i, modelInfo := range models {
 		yellow := color.New(color.FgHiYellow).SprintFunc()
+		if modelInfo.Name == DEFAULT_MODEL {
+			modelInfo.Name += " (default)"
+		}
 		modelName := boldGreen.Sprintf("%d. %s", i+1, modelInfo.Name)
 		padding := maxLen - len(modelInfo.Name) + 5
 		fmt.Println(modelName, strings.Repeat(" ", padding), yellow(strconv.Itoa(modelInfo.Speed)+" tokens/sec"))
