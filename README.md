@@ -12,6 +12,9 @@ Download and install with a single command:
 curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.sh | bash
 ```
 
+![Screencast_20251021_225003](https://github.com/user-attachments/assets/e71f059f-4a4e-4b6c-a205-f455055cfabb)
+
+
 > [!TIP]
 > You can also use the same command to update the tool to latest version.
 
@@ -24,6 +27,9 @@ ai "How to exit vim?"
 ```
 
 ### Interactive mode
+
+![Screencast_20251021_225624](https://github.com/user-attachments/assets/62fdb0e9-ca02-4bd5-ace2-a33080ece395)
+
 
 ```bash
 ai
