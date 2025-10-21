@@ -5,7 +5,7 @@ A cli AI tool powered by Groq API, aimed to answer quick questions right in the 
 ## Installing or Upgrading (Linux)
 
 ```bash
-curl -L https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.sh | bash
 
 ```
 

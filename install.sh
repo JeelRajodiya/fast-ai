@@ -14,11 +14,16 @@ DESTINATION="/usr/local/bin/ai"
 # Get the version of the latest release
 VERSION=$(curl -sI https://github.com/JeelRajodiya/fast-ai/releases/latest | grep "location:" | awk -F "/" '{ print $NF }' | tr -d '\r')
 
-echo -e "${YELLOW}Downloading ai binary version ${VERSION} from GitHub release...${NC}"
-# Get terminal width and set progress bar width to 50%
-WIDTH=$(tput cols)
-PROGRESS_BAR_WIDTH=$((WIDTH / 2))
-(stty cols $PROGRESS_BAR_WIDTH; sudo curl -L# $BINARY_URL -o $DESTINATION)
+# Get the size of the binary (follow redirects to get actual file size)
+SIZE=$(curl -sIL $BINARY_URL | grep -i "^content-length:" | tail -1 | awk '{print $2}' | tr -d '\r')
+if [ -n "$SIZE" ] && [ "$SIZE" -gt 0 ] 2>/dev/null; then
+    SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $SIZE/1048576}")
+    echo -e "${YELLOW}Downloading ai binary version ${VERSION} (${SIZE_MB} MB) from GitHub release...${NC}"
+else
+    echo -e "${YELLOW}Downloading ai binary version ${VERSION} from GitHub release...${NC}"
+fi
+
+sudo curl -fsSL  $BINARY_URL -o $DESTINATION
 
 echo -e "${YELLOW}Setting executable permissions...${NC}"
 sudo chmod +x $DESTINATION
