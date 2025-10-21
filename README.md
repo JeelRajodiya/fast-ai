@@ -4,8 +4,6 @@ A cli AI tool powered by Groq API, aimed to answer quick questions right in the 
 
 # Installation
 
-repo: https://github.com/JeelRajodiya/fast-ai
-
 ```bash
 curl -L https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.sh | bash
 
