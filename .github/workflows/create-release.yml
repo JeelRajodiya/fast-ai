@@ -1,4 +1,6 @@
 name: Go Build and Release
+permissions:
+  contents: write
 
 on:
   push:
@@ -38,6 +40,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./myapp
-          asset_name: myapp
+          asset_path: ./ai
+          asset_name: ai
           asset_content_type: application/octet-stream
