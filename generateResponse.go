@@ -26,18 +26,27 @@ func generateResponse(prompt interface{}) (string, error) {
 	}
 
 	var messages []groq.ChatCompletionMessage
+	systemPrompt := "You'll always respond in a concise to the point manner, answer what is being asked and nothing more, never use markdown in your responses."
 	switch p := prompt.(type) {
 	case string:
 		messages = []groq.ChatCompletionMessage{
 			{Role: groq.RoleSystem,
-				Content: "You'll always respond in a concise to the point manner, answer what is being asked and nothing more, avoid using markdown formatting."},
+				Content: systemPrompt,
+			},
 			{
 				Role:    groq.RoleUser,
 				Content: p,
 			},
 		}
 	case []groq.ChatCompletionMessage:
-		messages = p
+		// append system prompt at the start
+		messages = append([]groq.ChatCompletionMessage{
+			{
+				Role:    groq.RoleSystem,
+				Content: systemPrompt,
+			},
+		}, p...)
+
 	default:
 		return "", fmt.Errorf("invalid prompt type: %T", p)
 	}
