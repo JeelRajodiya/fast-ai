@@ -14,13 +14,14 @@ curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.s
 
 ![Screencast_20251021_225003](https://github.com/user-attachments/assets/e71f059f-4a4e-4b6c-a205-f455055cfabb)
 
-
 > [!TIP]
 > You can also use the same command to update the tool to latest version.
 
 ## Usage
 
-### One liner
+Get Groq API key from: [https://console.groq.com/keys](https://console.groq.com/keys)
+
+### Single Query mode
 
 ```bash
 ai "How to exit vim?"
@@ -29,7 +30,6 @@ ai "How to exit vim?"
 ### Interactive mode
 
 ![Screencast_20251021_225624](https://github.com/user-attachments/assets/62fdb0e9-ca02-4bd5-ace2-a33080ece395)
-
 
 ```bash
 ai
