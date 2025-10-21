@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.s
 ```
 
 > [!TIP]
-> You can also use the same script to update the tool to latest version.
+> You can also use the same command to update the tool to latest version.
 
 ## Usage
 
