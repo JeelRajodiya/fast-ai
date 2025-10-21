@@ -19,7 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.s
 
 ## Usage
 
-Get Groq API key from: [https://console.groq.com/keys](https://console.groq.com/keys)
+Get A Groq API key from: [https://console.groq.com/keys](https://console.groq.com/keys)
 
 ### Single Query mode
 
