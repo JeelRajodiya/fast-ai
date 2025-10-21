@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
+	"github.com/conneroisu/groq-go"
 	"github.com/fatih/color"
 )
 
@@ -17,12 +21,14 @@ func setup() {
 	// 1. ask for api key
 	// 2. let the user choose model
 	// dump the config to ~/.config/.fast-ai
+	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println()
 	fmt.Println("Welcome! Please configure settings for Fast AI.")
 	var apiKey string
 	boldGreen.Print("Enter your Groq API Key: ")
-	fmt.Scanln(&apiKey)
+	apiKey, _ = reader.ReadString('\n')
+	apiKey = strings.TrimSpace(apiKey)
 
 	// int or string
 	var modelChoice int
@@ -31,7 +37,13 @@ func setup() {
 		boldGreen.Printf("%d. %s\n", i+1, model)
 	}
 	boldGreen.Print("Enter choice (1-", len(models), "): ")
-	fmt.Scanln(&modelChoice)
+	choiceStr, _ := reader.ReadString('\n')
+	choiceStr = strings.TrimSpace(choiceStr)
+	modelChoice, err := strconv.Atoi(choiceStr)
+	if err != nil {
+		fmt.Println("Invalid choice, please enter a number.")
+		return
+	}
 
 	if modelChoice < 1 || modelChoice > len(models) {
 		fmt.Println("Invalid choice")
@@ -75,14 +87,9 @@ func main() {
 		setup()
 	}
 
-	// some global shortcuts
-	// exit or e - to exit
-	// config to re-run setup
-
 	// if one argument is passed, we'll use it as the prompt
 	if len(os.Args) == 2 {
 		prompt := os.Args[1]
-		fmt.Print(prompt)
 
 		response, err := generateResponse(prompt)
 		if err != nil {
@@ -97,5 +104,54 @@ func main() {
 	}
 
 	// interactive mode
+	// some global commands
+	// exit or e - to exit
+	// config to re-run setup
+
+	var messages []groq.ChatCompletionMessage
+
+	fmt.Println()
+	fmt.Println("Type " + color.YellowString("'exit'") + " or " + color.YellowString("'e'") + " to exit, " + color.YellowString("'config'") + " to re-run setup")
+	fmt.Println()
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		var userInput string
+
+		fmt.Print(color.MagentaString("You: "))
+
+		userInput, _ = reader.ReadString('\n')
+		userInput = strings.TrimSpace(userInput)
+
+		if userInput == "exit" || userInput == "e" {
+			fmt.Println("Exiting...")
+			break
+		}
+		if userInput == "config" {
+			setup()
+			continue
+		}
+
+		if userInput == "" {
+			continue
+		}
+
+		messages = append(messages, groq.ChatCompletionMessage{
+			Role:    groq.RoleUser,
+			Content: userInput,
+		})
+		response, err := generateResponse(messages)
+		if err != nil {
+			fmt.Println("Error generating response:", err)
+			return
+		}
+
+		boldGreen.Print("AI: ")
+		fmt.Println(" " + response)
+		messages = append(messages, groq.ChatCompletionMessage{
+			Role:    groq.RoleAssistant,
+			Content: response,
+		})
+		fmt.Println()
+	}
 
 }
