@@ -1,6 +1,6 @@
 # Fast AI
 
-A cli AI tool powered by Groq API, aimed to answer quick questions right in the terminal.
+👉🏻 A command-line AI for quick questions with acceptable [Time to First Token (TTFT)](https://docs.nvidia.com/nim/benchmarking/llm/latest/metrics.html#time-to-first-token-ttft), powered by the [Groq API](https://groq.com/)
 
 ## Installing or Upgrading (Linux)
 
