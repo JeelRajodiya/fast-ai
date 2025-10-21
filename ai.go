@@ -10,8 +10,6 @@ import (
 	"github.com/fatih/color"
 )
 
-var models []string = getModels()
-
 var boldGreen *color.Color = color.New(color.FgGreen, color.Bold)
 
 func main() {
@@ -19,8 +17,10 @@ func main() {
 	// check if file ~/.config/.fast-ai exists, if it does not exist we'll run the setup
 	_, err := os.Stat(os.Getenv("HOME") + "/.config/.fast-ai")
 
-	if os.IsNotExist(err) {
+	if os.IsNotExist(err) || (len(os.Args) == 2 && os.Args[1] == "--config") {
 		setup()
+		fmt.Println("Setup complete! You can now use the ai command.")
+		return
 	}
 
 	// if one argument is passed, we'll use it as the prompt
@@ -47,7 +47,7 @@ func main() {
 	var messages []groq.ChatCompletionMessage
 
 	fmt.Println()
-	fmt.Println("Type " + color.YellowString("'exit'") + " or " + color.YellowString("'e'") + " to exit, " + color.YellowString("'config'") + " to re-run setup")
+	fmt.Println("Type " + color.YellowString("'exit'") + " or " + color.YellowString("'e'") + " to exit, " + color.YellowString("'config'") + " to re-run setup, or use " + color.YellowString("ai --config") + " to re-run the setup")
 	fmt.Println()
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -58,7 +58,7 @@ func main() {
 		userInput, _ = reader.ReadString('\n')
 		userInput = strings.TrimSpace(userInput)
 
-		if userInput == "exit" || userInput == "e" {
+		if userInput == "exit" || userInput == "e" || userInput == "quit" || userInput == "q" {
 			fmt.Println("Exiting...")
 			break
 		}

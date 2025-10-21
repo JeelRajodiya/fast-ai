@@ -48,45 +48,65 @@ func setup() {
 		apiKey = apiKeyInput
 	}
 	fmt.Println()
-	// int or string
-	var modelChoice int
+
 	fmt.Println("Choose a model:")
-	for i, model := range models {
-		boldGreen.Printf("%d. %s\n", i+1, model)
+	// find max length of model name
+	maxLen := 0
+	for _, model := range models {
+		if len(model.Name) > maxLen {
+			maxLen = len(model.Name)
+		}
+	}
+	for i, modelInfo := range models {
+		yellow := color.New(color.FgHiYellow).SprintFunc()
+		modelName := boldGreen.Sprintf("%d. %s", i+1, modelInfo.Name)
+		padding := maxLen - len(modelInfo.Name) + 5
+		fmt.Println(modelName, strings.Repeat(" ", padding), yellow(strconv.Itoa(modelInfo.Speed)+" tokens/sec"))
 	}
 	fmt.Println()
-	fmt.Print(color.MagentaString(fmt.Sprintf("Enter choice (1-%d): ", len(models))))
+	fmt.Print(color.MagentaString(fmt.Sprintf("Enter choice (1-%d), press enter to use the default: ", len(models))))
 	choiceStr, _ := reader.ReadString('\n')
 	choiceStr = strings.TrimSpace(choiceStr)
-	modelChoice, err := strconv.Atoi(choiceStr)
-	if err != nil {
-		fmt.Println("Invalid choice, please enter a number.")
-		return
+
+	var selectedModel ModelInfo
+	if choiceStr == "" {
+		// find default model and set it
+		for _, model := range models {
+			if model.Name == DEFAULT_MODEL {
+				selectedModel = model
+				break
+			}
+		}
+	} else {
+		modelChoice, err := strconv.Atoi(choiceStr)
+		if err != nil {
+			fmt.Println("Invalid choice, please enter a number.")
+			return
+		}
+
+		if modelChoice < 1 || modelChoice > len(models) {
+			fmt.Println("Invalid choice")
+			return
+		}
+
+		selectedModel = models[modelChoice-1]
 	}
 
-	if modelChoice < 1 || modelChoice > len(models) {
-		fmt.Println("Invalid choice")
-		return
-	}
-
-	selectedModel := models[modelChoice-1]
-	boldGreen.Println("Selected model:", selectedModel)
+	boldGreen.Println("Selected model:", selectedModel.Name)
 
 	// write to config file
-
 	config := Config{
 		GROQ_API_KEY: apiKey,
-		Model:        selectedModel,
+		Model:        selectedModel.Code,
 	}
 	configJSON, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		fmt.Println("Error creating config JSON:", err)
 		return
 	}
-	configContent := string(configJSON)
 
 	configPath := os.Getenv("HOME") + "/.config/.fast-ai"
-	err = os.WriteFile(configPath, []byte(configContent), 0600)
+	err = os.WriteFile(configPath, configJSON, 0600)
 
 	if err != nil {
 		fmt.Println("Error writing config file:", err)
@@ -94,5 +114,4 @@ func setup() {
 	}
 
 	fmt.Println("Setup complete! Config saved to", configPath)
-
 }
