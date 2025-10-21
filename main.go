@@ -63,15 +63,22 @@ func generateResponse(model string, prompt string) (string, error) {
 
 func main() {
 
-	// openai120B := "openai/gpt-oss-120b" // 500 T/s
-	// openai20B := "openai/gpt-oss-20b" // 1000 T/s
+	openai120B := "openai/gpt-oss-120b"   // 500 T/s
+	openai20B := "openai/gpt-oss-20b"     // 1000 T/s
 	llama70B := "llama-3.3-70b-versatile" // 280 T/s
-	// compound := "groq/compound"// 450 T/s
+	compound := "groq/compound"           // 450 T/s
+	qwen := "qwen/qwen3-32b"              // 400 T/s
 
-	// qwen := "qwen/qwen3-32b" // 400 T/s
+	models := []string{
+		openai120B,
+		openai20B,
+		llama70B,
+		compound,
+		qwen,
+	}
 	prompt := os.Args[1]
 
-	response, err := generateResponse(llama70B, prompt)
+	response, err := generateResponse(models[2], prompt)
 	if err != nil {
 		fmt.Println("Error generating response:", err)
 		return
