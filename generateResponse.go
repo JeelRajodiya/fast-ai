@@ -4,38 +4,49 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/conneroisu/groq-go"
-	"github.com/joho/godotenv"
 )
 
-func generateResponse(model string, prompt string) (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
+func generateResponse(prompt interface{}) (string, error) {
+	config, err := getConfig()
 
+	if err != nil {
+		return "", fmt.Errorf("error getting config: %w", err)
 	}
-	api := os.Getenv("groq_API")
+
+	api := config.GROQ_API_KEY
+	model := config.Model
+
 	client, err := groq.NewClient(api)
 	if err != nil {
 		fmt.Println("Error creating Groq client:", err)
 		return "", err
 	}
 
+	var messages []groq.ChatCompletionMessage
+	switch p := prompt.(type) {
+	case string:
+		messages = []groq.ChatCompletionMessage{
+			{Role: groq.RoleSystem,
+				Content: "You'll always respond in a concise to the point manner, answer what is being asked and nothing more, avoid using markdown formatting."},
+			{
+				Role:    groq.RoleUser,
+				Content: p,
+			},
+		}
+	case []groq.ChatCompletionMessage:
+		messages = p
+	default:
+		return "", fmt.Errorf("invalid prompt type: %T", p)
+	}
+
 	response, err := client.ChatCompletion(
 		context.Background(),
 		groq.ChatCompletionRequest{
-			Model: groq.ChatModel(model), // Select your model
-			Messages: []groq.ChatCompletionMessage{
-				{Role: groq.RoleSystem,
-					Content: "You'll always respond in a concise to the point manner, answer what is being asked and nothing more, avoid using markdown formatting."},
-				{
-					Role:    groq.RoleUser,
-					Content: prompt,
-				},
-			},
+			Model:    groq.ChatModel(model), // Select your model
+			Messages: messages,
 		},
 	)
 

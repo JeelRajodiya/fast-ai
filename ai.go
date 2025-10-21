@@ -1,28 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/fatih/color"
 )
-
-func getModels() []string {
-	openai120B := "openai/gpt-oss-120b"   // 500 T/s
-	openai20B := "openai/gpt-oss-20b"     // 1000 T/s
-	llama70B := "llama-3.3-70b-versatile" // 280 T/s
-	compound := "groq/compound"           // 450 T/s
-	qwen := "qwen/qwen3-32b"              // 400 T/s
-
-	models := []string{
-		openai120B,
-		openai20B,
-		llama70B,
-		compound,
-		qwen,
-	}
-	return models
-}
 
 var models []string = getModels()
 
@@ -59,10 +43,19 @@ func setup() {
 
 	// write to config file
 
-	configContent := fmt.Sprintf("API_KEY=%s\nMODEL=%s\n", apiKey, selectedModel)
+	config := Config{
+		GROQ_API_KEY: apiKey,
+		Model:        selectedModel,
+	}
+	configJSON, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		fmt.Println("Error creating config JSON:", err)
+		return
+	}
+	configContent := string(configJSON)
 
 	configPath := os.Getenv("HOME") + "/.config/.fast-ai"
-	err := os.WriteFile(configPath, []byte(configContent), 0600)
+	err = os.WriteFile(configPath, []byte(configContent), 0600)
 
 	if err != nil {
 		fmt.Println("Error writing config file:", err)
@@ -86,15 +79,23 @@ func main() {
 	// exit or e - to exit
 	// config to re-run setup
 
-	prompt := os.Args[1]
+	// if one argument is passed, we'll use it as the prompt
+	if len(os.Args) == 2 {
+		prompt := os.Args[1]
+		fmt.Print(prompt)
 
-	response, err := generateResponse(models[2], prompt)
-	if err != nil {
-		fmt.Println("Error generating response:", err)
+		response, err := generateResponse(prompt)
+		if err != nil {
+			fmt.Println("Error generating response:", err)
+			return
+		}
+
+		boldGreen.Print("Response:")
+		fmt.Println(" " + response)
 		return
+
 	}
 
-	boldGreen.Print("Response:")
-	fmt.Println(" " + response)
+	// interactive mode
 
 }
