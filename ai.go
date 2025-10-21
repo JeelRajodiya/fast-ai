@@ -15,7 +15,7 @@ var boldGreen *color.Color = color.New(color.FgGreen, color.Bold)
 func main() {
 
 	// check if file ~/.config/.fast-ai exists, if it does not exist we'll run the setup
-	_, err := os.Stat(os.Getenv("HOME") + "/.config/.fast-ai")
+	config, err := getConfig()
 
 	if os.IsNotExist(err) || (len(os.Args) == 2 && os.Args[1] == "--config") {
 		setup()
@@ -46,7 +46,7 @@ func main() {
 
 	var messages []groq.ChatCompletionMessage
 
-	fmt.Println()
+	fmt.Println("Config loaded! using Model:", color.YellowString(config.Model))
 	fmt.Println("Type " + color.YellowString("'exit'") + " or " + color.YellowString("'e'") + " to exit, " + color.YellowString("'config'") + " to re-run setup, or use " + color.YellowString("ai --config") + " to re-run the setup")
 	fmt.Println()
 	reader := bufio.NewReader(os.Stdin)
