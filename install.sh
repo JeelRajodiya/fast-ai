@@ -9,7 +9,14 @@ NC='\033[0m' # No Color
 BINARY_URL="https://github.com/JeelRajodiya/fast-ai/releases/latest/download/ai"
 
 # Destination path to place the binary
-DESTINATION="/usr/local/bin/ai"
+# Use ~/.local/bin if it exists, otherwise fall back to /usr/local/bin (requires sudo)
+if [ -d "$HOME/.local/bin" ]; then
+    DESTINATION="$HOME/.local/bin/ai"
+    USE_SUDO=""
+else
+    DESTINATION="/usr/local/bin/ai"
+    USE_SUDO="sudo"
+fi
 
 # Get the version of the latest release
 VERSION=$(curl -sI https://github.com/JeelRajodiya/fast-ai/releases/latest | grep "location:" | awk -F "/" '{ print $NF }' | tr -d '\r')
@@ -23,10 +30,13 @@ else
     echo -e "${YELLOW}Downloading ai binary version ${VERSION} from GitHub release...${NC}"
 fi
 
-sudo curl -fsSL  $BINARY_URL -o $DESTINATION
+# Create destination directory if it doesn't exist
+mkdir -p "$(dirname "$DESTINATION")"
+
+$USE_SUDO curl -fsSL  $BINARY_URL -o $DESTINATION
 
 echo -e "${YELLOW}Setting executable permissions...${NC}"
-sudo chmod +x $DESTINATION
+$USE_SUDO chmod +x $DESTINATION
 
 echo -e "${GREEN}Installation complete.${NC}"
 echo -e "You can run it using the command: ${GREEN}ai${NC}"
