@@ -27,5 +27,5 @@ ai
 ## Uninstalling
 
 ```bash
-curl -L https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/uninstall.sh | bash
 ```
