@@ -32,7 +32,8 @@ func setup() {
 
 	models := getModels()
 	var apiKey string
-
+	var underline = color.New(color.Underline)
+	fmt.Println("Get API key from: ", underline.Sprint("https://console.groq.com/keys"))
 	if configErr == nil {
 		boldGreen.Print("Enter your Groq API Key (press enter to keep current): ")
 	} else {
