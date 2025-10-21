@@ -1,69 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"os"
-	"strings"
 
-	"github.com/conneroisu/groq-go"
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 )
 
-func generateResponse(model string, prompt string) (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-
-	}
-	api := os.Getenv("groq_API")
-	client, err := groq.NewClient(api)
-	if err != nil {
-		fmt.Println("Error creating Groq client:", err)
-		return "", err
-	}
-
-	response, err := client.ChatCompletion(
-		context.Background(),
-		groq.ChatCompletionRequest{
-			Model: groq.ChatModel(model), // Select your model
-			Messages: []groq.ChatCompletionMessage{
-				{Role: groq.RoleSystem,
-					Content: "You'll always respond in a concise to the point manner, answer what is being asked and nothing more, avoid using markdown formatting."},
-				{
-					Role:    groq.RoleUser,
-					Content: prompt,
-				},
-			},
-		},
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// remove everything beween <think> and </think> tags from the response, remove the tags and content betweent it
-	responseText := response.Choices[0].Message.Content
-
-	startTag := "<think>"
-	endTag := "</think>"
-	for {
-		startIndex := strings.Index(responseText, startTag)
-		endIndex := strings.Index(responseText, endTag)
-		if startIndex == -1 || endIndex == -1 || endIndex < startIndex {
-			break
-		}
-		responseText = responseText[:startIndex] + responseText[endIndex+len(endTag):]
-	}
-
-	return strings.TrimSpace(responseText), nil
-
-}
-
-func main() {
-
+func getModels() []string {
 	openai120B := "openai/gpt-oss-120b"   // 500 T/s
 	openai20B := "openai/gpt-oss-20b"     // 1000 T/s
 	llama70B := "llama-3.3-70b-versatile" // 280 T/s
@@ -77,6 +21,71 @@ func main() {
 		compound,
 		qwen,
 	}
+	return models
+}
+
+var models []string = getModels()
+
+var boldGreen *color.Color = color.New(color.FgGreen, color.Bold)
+
+func setup() {
+	// setup will
+	// 1. ask for api key
+	// 2. let the user choose model
+	// dump the config to ~/.config/.fast-ai
+
+	fmt.Println()
+	fmt.Println("Welcome! Please configure settings for Fast AI.")
+	var apiKey string
+	boldGreen.Print("Enter your Groq API Key: ")
+	fmt.Scanln(&apiKey)
+
+	// int or string
+	var modelChoice int
+	boldGreen.Println("Choose a model:")
+	for i, model := range models {
+		boldGreen.Printf("%d. %s\n", i+1, model)
+	}
+	boldGreen.Print("Enter choice (1-", len(models), "): ")
+	fmt.Scanln(&modelChoice)
+
+	if modelChoice < 1 || modelChoice > len(models) {
+		fmt.Println("Invalid choice")
+		return
+	}
+
+	selectedModel := models[modelChoice-1]
+	boldGreen.Println("Selected model:", selectedModel)
+
+	// write to config file
+
+	configContent := fmt.Sprintf("API_KEY=%s\nMODEL=%s\n", apiKey, selectedModel)
+
+	configPath := os.Getenv("HOME") + "/.config/.fast-ai"
+	err := os.WriteFile(configPath, []byte(configContent), 0600)
+
+	if err != nil {
+		fmt.Println("Error writing config file:", err)
+		return
+	}
+
+	fmt.Println("Setup complete! Config saved to", configPath)
+
+}
+
+func main() {
+
+	// check if file ~/.config/.fast-ai exists, if it does not exist we'll run the setup
+	_, err := os.Stat(os.Getenv("HOME") + "/.config/.fast-ai")
+
+	if os.IsNotExist(err) {
+		setup()
+	}
+
+	// some global shortcuts
+	// exit or e - to exit
+	// config to re-run setup
+
 	prompt := os.Args[1]
 
 	response, err := generateResponse(models[2], prompt)
@@ -84,7 +93,7 @@ func main() {
 		fmt.Println("Error generating response:", err)
 		return
 	}
-	boldGreen := color.New(color.FgGreen, color.Bold)
+
 	boldGreen.Print("Response:")
 	fmt.Println(" " + response)
 
