@@ -10,6 +10,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # Linux builds
+          - goos: linux
+            goarch: amd64
+            output: ai-linux-amd64
+          - goos: linux
+            goarch: arm64
+            output: ai-linux-arm64
+          # macOS builds
+          - goos: darwin
+            goarch: amd64
+            output: ai-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            output: ai-darwin-arm64
+          # Windows builds
+          - goos: windows
+            goarch: amd64
+            output: ai-windows-amd64.exe
+          - goos: windows
+            goarch: arm64
+            output: ai-windows-arm64.exe
 
     steps:
       - name: Checkout code
@@ -34,13 +58,32 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Build
-        run: go build -o ai
+      - name: Build for ${{ matrix.goos }}-${{ matrix.goarch }}
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: go build -o ${{ matrix.output }} -ldflags="-s -w"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
-          files: ./ai
+          files: ./artifacts/**/*
           draft: false
           prerelease: false
           generate_release_notes: true
