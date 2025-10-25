@@ -13,7 +13,7 @@ type ModelInfo struct {
 	Speed int // tokens per second
 }
 
-var DEFAULT_MODEL = "Qwen 3 32B"
+var DEFAULT_MODEL = "Compound"
 
 func getModels() []ModelInfo {
 	models := []ModelInfo{
