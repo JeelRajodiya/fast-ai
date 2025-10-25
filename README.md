@@ -17,6 +17,10 @@ curl -fsSL https://raw.githubusercontent.com/JeelRajodiya/fast-ai/main/install.s
 > [!TIP]
 > You can also use the same command to update the tool to latest version.
 
+## Installing (MacOS/Windows)
+
+Please download the binary from the [Releases](https://github.com/JeelRajodiya/fast-ai/releases) page and add it to your system PATH.
+
 ## Usage
 
 Get A Groq API key from: [https://console.groq.com/keys](https://console.groq.com/keys)
